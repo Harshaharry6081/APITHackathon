@@ -1,0 +1,129 @@
+﻿<div class="app-container">
+  <div class="header">
+    <h1> AI Early Warning System</h1>
+    <p>Student Dropout Prevention Dashboard - Andhra Pradesh School Education Department</p>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card total">
+      <h3>Total Students Monitored</h3>
+      <div class="value">{{ totalStudents }}</div>
+    </div>
+    <div class="stat-card high-risk">
+      <h3>High Risk Students</h3>
+      <div class="value">{{ highRiskCount }}</div>
+    </div>
+    <div class="stat-card moderate-risk">
+      <h3>Moderate Risk Students</h3>
+      <div class="value">{{ moderateRiskCount }}</div>
+    </div>
+    <div class="stat-card low-risk">
+      <h3>Low Risk Students</h3>
+      <div class="value">{{ lowRiskCount }}</div>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <div class="panel">
+      <h2> Priority At-Risk Students</h2>
+      <div class="controls">
+        <select [(ngModel)]="selectedDistrict" (change)="onDistrictChange()" class="form-control">
+          <option *ngFor="let district of districts" [value]="district">
+            {{ district === 'all' ? 'All Districts' : district }}
+          </option>
+        </select>
+        
+        <select [(ngModel)]="selectedThreshold" (change)="onThresholdChange()" class="form-control">
+          <option [value]="50">Risk Threshold: 50%+</option>
+          <option [value]="70">Risk Threshold: 70%+</option>
+          <option [value]="80">Risk Threshold: 80%+</option>
+        </select>
+        
+        <button (click)="loadData()" class="btn-primary">Refresh Data</button>
+      </div>
+      
+      <div class="student-list">
+        <div *ngIf="filteredStudents.length === 0" class="no-data">
+          <p>Loading students or no students match the current filters...</p>
+        </div>
+        
+        <div *ngFor="let student of filteredStudents" 
+             [class]="'student-card ' + getRiskClass(student.risk)">
+          <div class="student-header">
+            <span class="student-id">{{ student.id }}</span>
+            <span [class]="getRiskBadgeClass(student.risk)">
+              {{ student.risk }} ({{ student.probability }}%)
+            </span>
+          </div>
+          
+          <div class="student-info">
+             {{ student.district }} | Grade {{ student.grade }}
+          </div>
+          
+          <div class="risk-reasons">
+            <strong>Risk Factors:</strong>
+            <ul>
+              <li *ngFor="let reason of student.reasons.slice(0, 3)">{{ reason }}</li>
+            </ul>
+          </div>
+          
+          <div class="action-buttons">
+            <button (click)="viewStudent(student.id)" class="btn-primary">View Details</button>
+            <button (click)="quickIntervention(student.id)" class="btn-secondary">Quick Action</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2> System Performance</h2>
+      
+      <div class="model-metrics" *ngIf="modelMetrics">
+        <h4> PoC Success Criteria</h4>
+        <div class="metric-row">
+          <span>Model Accuracy:</span>
+          <span class="metric-value">{{ (modelMetrics.model_accuracy * 100).toFixed(1) }}%</span>
+        </div>
+        <div class="metric-row">
+          <span>Inclusion Error:</span>
+          <span class="metric-value">{{ modelMetrics.inclusion_error.toFixed(1) }}% (&lt;80% )</span>
+        </div>
+        <div class="metric-row">
+          <span>Exclusion Error:</span>
+          <span class="metric-value">{{ modelMetrics.exclusion_error.toFixed(1) }}% (&lt;20% )</span>
+        </div>
+        <div class="metric-row">
+          <span>Target Met:</span>
+          <span class="metric-value">{{ modelMetrics.poc_criteria_met ? 'Yes ' : 'No ' }}</span>
+        </div>
+      </div>
+
+      <h3 class="section-title"> Log Intervention</h3>
+      <div class="intervention-form">
+        <input 
+          type="text" 
+          [(ngModel)]="interventionStudentId" 
+          placeholder="Student ID (e.g., ST001)" 
+          class="form-input">
+        
+        <textarea 
+          [(ngModel)]="interventionAction" 
+          rows="3" 
+          placeholder="Describe intervention action..."
+          class="form-textarea"></textarea>
+        
+        <input 
+          type="text" 
+          [(ngModel)]="interventionOfficer" 
+          placeholder="Your name" 
+          class="form-input">
+        
+        <button (click)="logIntervention()" class="btn-primary btn-full">
+          Record Intervention
+        </button>
+      </div>
+
+      <div class="output" [innerHTML]="outputMessage"></div>
+    </div>
+  </div>
+</div>

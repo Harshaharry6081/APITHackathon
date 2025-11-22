@@ -1,0 +1,43 @@
+{
+  "model_accuracy": 1.0,
+  "inclusion_error": 0.0,
+  "exclusion_error": 0.0,
+  "feature_importance": [
+    {
+      "feature": "transport_allowance_used",
+      "coefficient": -0.5265715660162932,
+      "abs_coefficient": 0.5265715660162932
+    },
+    {
+      "feature": "migration_indicator",
+      "coefficient": 0.5253102535665396,
+      "abs_coefficient": 0.5253102535665396
+    },
+    {
+      "feature": "social_category",
+      "coefficient": 0.5253102535665396,
+      "abs_coefficient": 0.5253102535665396
+    },
+    {
+      "feature": "exam_score",
+      "coefficient": -0.35341111896173605,
+      "abs_coefficient": 0.35341111896173605
+    },
+    {
+      "feature": "socio_economic_status",
+      "coefficient": -0.032077281916264265,
+      "abs_coefficient": 0.032077281916264265
+    },
+    {
+      "feature": "attendance",
+      "coefficient": 0.005458169092467978,
+      "abs_coefficient": 0.005458169092467978
+    },
+    {
+      "feature": "gender",
+      "coefficient": 9.533755009792253e-05,
+      "abs_coefficient": 9.533755009792253e-05
+    }
+  ],
+  "poc_criteria_met": true
+}

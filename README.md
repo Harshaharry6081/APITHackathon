@@ -48,15 +48,22 @@ python -m pip install pandas scikit-learn numpy
 
 ```bash
 # Run the enhanced AI model
+# If 'python' command doesn't work, use the full path:
+# Windows: & "C:\Users\Developer\AppData\Local\Programs\Python\Python311\python.exe" model.py
 python model.py
 
 # Expected Output:
 # ✅ Model Accuracy: 100%
 # ✅ Inclusion Error: 0% (Target: <80%)
 # ✅ Exclusion Error: 0% (Target: <20%)
-# ✅ Trained on 4,424 students from Kaggle dataset
+# ✅ Feature Importance: transport_allowance_used (-0.527), migration_indicator (0.525)
 # ✅ PoC Success Criteria: MET
 ```
+
+**Note**: If you see "Python was not found", disable the Windows Store alias:
+1. Go to Settings > Apps > Advanced app settings > App execution aliases
+2. Turn OFF "python.exe" and "python3.exe" aliases
+3. Or use the full Python path shown above
 
 ### 3️⃣ Start the Backend API
 
@@ -249,9 +256,11 @@ Plus feature importance weights so teachers understand *why* predictions are mad
 
 1. **Validate ML Model**: 
    ```bash
+   # Use full path if 'python' command fails:
+   # & "C:\Users\Developer\AppData\Local\Programs\Python\Python311\python.exe" model.py
    python model.py
    ```
-   Expected: 100% accuracy, 0% inclusion/exclusion errors
+   Expected: 100% accuracy, 0% inclusion/exclusion errors, Feature importance weights displayed
 
 2. **Start Backend Server**:
    ```bash
@@ -282,6 +291,58 @@ Plus feature importance weights so teachers understand *why* predictions are mad
 - Dataset: 4,424 real students from Kaggle (48K+ downloads)
 - Source: UCI ML Repository / Portuguese Higher Education
 - License: CC0-1.0 (Public Domain)
+
+---
+
+---
+
+## ☁️ Production Deployment
+
+### **GCP Deployment** (Recommended)
+For production-grade deployment with auto-scaling, monitoring, and DPDP Act 2023 compliance:
+
+📖 **See detailed guide**: [GCP_DEPLOYMENT_PLAN.md](./GCP_DEPLOYMENT_PLAN.md)
+
+**Quick Overview:**
+- **Cloud Run** for serverless backend API (auto-scaling 0-1000+ requests)
+- **Cloud SQL (PostgreSQL)** for intervention logs and audit trails
+- **Cloud Memorystore (Redis)** for caching risk scores
+- **Vertex AI** for ML model hosting and monitoring
+- **Firebase Hosting** or **Cloud Storage + CDN** for Angular dashboard
+- **Cloud Armor** for DDoS protection and rate limiting
+- **Secret Manager** for secure credential storage
+
+**Estimated Cost**: $25-$765/month (based on scale)  
+**Deployment Time**: 3-4 weeks  
+**Security**: DPDP Act 2023 compliant, data residency in India
+
+### **Docker Deployment** (Local/VM)
+For development or on-premises deployment:
+
+```bash
+# Start all services with Docker Compose
+docker-compose up -d
+
+# Services will be available at:
+# - Backend API: http://localhost:3000
+# - ML Service: http://localhost:8081
+# - Dashboard: http://localhost:80
+# - PostgreSQL: localhost:5432
+# - Redis: localhost:6379
+
+# View logs
+docker-compose logs -f
+
+# Stop services
+docker-compose down
+```
+
+**Included Services:**
+- Node.js Backend API (Express)
+- Python ML Service (Flask)
+- PostgreSQL 15 (with automated init script)
+- Redis 7 (for caching)
+- Nginx (reverse proxy with rate limiting)
 
 ---
 

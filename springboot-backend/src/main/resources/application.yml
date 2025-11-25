@@ -1,0 +1,136 @@
+spring:
+  application:
+    name: dropout-prevention-system
+  
+  # Database Configuration
+  datasource:
+    # H2 In-Memory Database (for quick testing)
+    url: jdbc:h2:mem:dropoutdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+    
+    # PostgreSQL (uncomment for production)
+    # url: jdbc:postgresql://localhost:5432/dropout_prevention
+    # driver-class-name: org.postgresql.Driver
+    # username: appuser
+    # password: secure_password_123
+    
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 30000
+  
+  # JPA/Hibernate Configuration
+  jpa:
+    hibernate:
+      ddl-auto: update  # create-drop for dev, update for prod
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect  # Change to PostgreSQLDialect for prod
+        format_sql: true
+        use_sql_comments: true
+  
+  # H2 Console (for debugging)
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  
+  # Redis Cache Configuration
+  cache:
+    type: simple  # Change to 'redis' when Redis is available
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 2000ms
+  
+  # Jackson JSON Configuration
+  jackson:
+    default-property-inclusion: non_null
+    serialization:
+      write-dates-as-timestamps: false
+    time-zone: Asia/Kolkata
+
+# Server Configuration
+server:
+  port: 8080
+  servlet:
+    context-path: /
+  compression:
+    enabled: true
+    mime-types: application/json,application/xml,text/html,text/xml,text/plain
+  error:
+    include-message: always
+    include-binding-errors: always
+
+# Actuator Configuration (Health Checks, Metrics)
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+# Application Properties
+app:
+  dataset:
+    kaggle-file: ../dataset_kaggle.json
+  cors:
+    allowed-origins: http://localhost:4200,http://localhost:3000,http://localhost:80
+  risk:
+    high-threshold: 70.0
+    moderate-threshold: 50.0
+
+# Logging Configuration
+logging:
+  level:
+    root: INFO
+    com.apithackathon.dropout: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/dropout-prevention.log
+
+# Spring Profiles
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+  jpa:
+    show-sql: true
+logging:
+  level:
+    com.apithackathon.dropout: DEBUG
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+  datasource:
+    url: jdbc:postgresql://localhost:5432/dropout_prevention
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+logging:
+  level:
+    root: WARN
+    com.apithackathon.dropout: INFO

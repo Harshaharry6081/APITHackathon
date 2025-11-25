@@ -166,13 +166,14 @@ app.get('/districts/:name/stats', (req, res) => {
 // Log intervention
 const interventions = [];
 app.post("/interventions", (req, res) => {
-  const { studentId, type, description, date } = req.body;
+  const { studentId, type, description, date, action, actionedBy } = req.body;
 
   const intervention = {
     id: interventions.length + 1,
     studentId,
-    type,
-    description,
+    type: type || 'Counseling',
+    description: description || action,
+    actionedBy: actionedBy || 'Teacher',
     date: date || new Date().toISOString(),
     timestamp: Date.now()
   };
@@ -183,6 +184,41 @@ app.post("/interventions", (req, res) => {
     message: "Intervention logged successfully",
     intervention
   });
+});
+
+// Get all interventions
+app.get("/interventions", (req, res) => {
+  const { studentId, limit = 50 } = req.query;
+  
+  let filtered = interventions;
+  
+  // Filter by student ID if provided
+  if (studentId) {
+    filtered = interventions.filter(i => i.studentId === studentId);
+  }
+  
+  // Sort by most recent first and limit results
+  const sorted = filtered
+    .sort((a, b) => b.timestamp - a.timestamp)
+    .slice(0, parseInt(limit));
+  
+  res.json({
+    total: filtered.length,
+    showing: sorted.length,
+    interventions: sorted
+  });
+});
+
+// Get intervention by ID
+app.get("/interventions/:id", (req, res) => {
+  const id = parseInt(req.params.id);
+  const intervention = interventions.find(i => i.id === id);
+  
+  if (intervention) {
+    res.json(intervention);
+  } else {
+    res.status(404).json({ error: "Intervention not found" });
+  }
 });
 
 // LEAP Integration - Field worker update endpoint

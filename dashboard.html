@@ -342,6 +342,13 @@
         <button onclick="logIntervention()" style="width: 100%; margin-top: 10px;">Record Intervention</button>
       </div>
 
+      <h3 style="margin-top: 30px; margin-bottom: 15px;">📋 Recent Interventions</h3>
+      <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+        <button onclick="loadInterventions()" class="secondary">Refresh List</button>
+        <button onclick="loadInterventions('all')" class="secondary">View All</button>
+      </div>
+      <div id="interventionsList" style="max-height: 400px; overflow-y: auto;"></div>
+
       <div id="output"></div>
     </div>
   </div>
@@ -483,9 +490,93 @@
         // Clear form
         document.getElementById("interventionStudent").value = "";
         document.getElementById("interventionAction").value = "";
+        
+        // Reload interventions list
+        loadInterventions();
       } catch (error) {
         document.getElementById("output").textContent = "Error logging intervention";
       }
+    }
+
+    // Load interventions
+    async function loadInterventions(scope = 'recent') {
+      try {
+        const limit = scope === 'all' ? 500 : 20;
+        const res = await fetch(`${API_BASE}/interventions?limit=${limit}`);
+        const data = await res.json();
+        
+        const container = document.getElementById("interventionsList");
+        
+        if (data.interventions.length === 0) {
+          container.innerHTML = `
+            <div style="text-align: center; padding: 30px; color: #888;">
+              <p style="font-size: 18px;">📝</p>
+              <p>No interventions logged yet</p>
+              <p style="font-size: 12px; margin-top: 10px;">Use the form above to record your first intervention</p>
+            </div>
+          `;
+          return;
+        }
+        
+        container.innerHTML = `
+          <div style="margin-bottom: 10px; color: #666; font-size: 13px;">
+            Showing ${data.showing} of ${data.total} interventions
+          </div>
+          ${data.interventions.map(intervention => {
+            const date = new Date(intervention.date);
+            const timeAgo = getTimeAgo(date);
+            
+            return `
+              <div style="background: #f8f9fa; border-left: 4px solid #3498db; padding: 12px; margin-bottom: 10px; border-radius: 4px;">
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+                  <div>
+                    <strong style="color: #2c3e50;">Student: ${intervention.studentId}</strong>
+                    <span style="margin-left: 10px; font-size: 12px; color: #7f8c8d;">
+                      ID: #${intervention.id}
+                    </span>
+                  </div>
+                  <span style="font-size: 12px; color: #7f8c8d;">${timeAgo}</span>
+                </div>
+                <div style="margin-bottom: 6px; color: #555;">
+                  <strong>Action:</strong> ${intervention.description || intervention.action || 'N/A'}
+                </div>
+                <div style="display: flex; gap: 15px; font-size: 12px; color: #7f8c8d;">
+                  <span><strong>Type:</strong> ${intervention.type || 'Counseling'}</span>
+                  <span><strong>By:</strong> ${intervention.actionedBy || 'Teacher'}</span>
+                  <span><strong>Date:</strong> ${date.toLocaleString()}</span>
+                </div>
+              </div>
+            `;
+          }).join('')}
+        `;
+      } catch (error) {
+        console.error('Error loading interventions:', error);
+        document.getElementById("interventionsList").innerHTML = 
+          '<div style="color: #e74c3c; padding: 15px;">Error loading interventions</div>';
+      }
+    }
+
+    // Helper function to calculate time ago
+    function getTimeAgo(date) {
+      const seconds = Math.floor((new Date() - date) / 1000);
+      
+      const intervals = {
+        year: 31536000,
+        month: 2592000,
+        week: 604800,
+        day: 86400,
+        hour: 3600,
+        minute: 60
+      };
+      
+      for (const [unit, secondsInUnit] of Object.entries(intervals)) {
+        const interval = Math.floor(seconds / secondsInUnit);
+        if (interval >= 1) {
+          return `${interval} ${unit}${interval > 1 ? 's' : ''} ago`;
+        }
+      }
+      
+      return 'Just now';
     }
 
     // District filter change
@@ -501,6 +592,7 @@
     // Initialize dashboard
     loadModelMetrics();
     loadAtRiskStudents();
+    loadInterventions();
   </script>
 </body>
 </html>

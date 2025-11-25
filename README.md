@@ -67,10 +67,20 @@ python model.py
 
 ### 3️⃣ Start the Backend API
 
+**Option A: Node.js Backend** (Quick & Lightweight)
 ```bash
 npm start
 # Server runs on http://localhost:3000
 ```
+
+**Option B: Spring Boot Backend** (Enterprise-Grade)
+```bash
+cd springboot-backend
+mvn spring-boot:run
+# Server runs on http://localhost:8080
+```
+
+See [springboot-backend/README.md](./springboot-backend/README.md) for Spring Boot details.
 
 ### 4️⃣ Open the Dashboard
 
@@ -219,9 +229,11 @@ Plus feature importance weights so teachers understand *why* predictions are mad
 | Component | Technology |
 |-----------|-----------|
 | **ML Model** | Python 3.11 + scikit-learn 1.7.2 (Logistic Regression) |
-| **Backend API** | Node.js 22.9.0 + Express 4.18.2 |
+| **Backend API (Node.js)** | Node.js 22.9.0 + Express 4.18.2 |
+| **Backend API (Spring Boot)** | Java 17 + Spring Boot 3.2.0 + JPA/Hibernate |
 | **Dashboard (HTML)** | HTML5/CSS3/JavaScript (Vanilla) |
 | **Dashboard (Angular)** | Angular 19 + TypeScript 5.x + RxJS |
+| **Database** | H2 (dev) / PostgreSQL 15 (prod) |
 | **Dataset** | Kaggle (4,424 students from UCI ML Repository) |
 | **Integration** | RESTful APIs (LEAP-compatible) |
 
@@ -231,7 +243,8 @@ Plus feature importance weights so teachers understand *why* predictions are mad
 
 ### **Core Application**
 - `model.py` - ML model with 7 risk factors (Logistic Regression)
-- `server.js` - Backend API with LEAP integration (loads Kaggle dataset)
+- `server.js` - Node.js backend API with LEAP integration (loads Kaggle dataset)
+- `springboot-backend/` - **Spring Boot Java backend** (Enterprise-grade, port 8080)
 - `dashboard.html` - Professional HTML visualization dashboard
 - `ai-dashboard/` - Enterprise Angular 19 TypeScript dashboard
 - `index.html` - Simple demo UI
@@ -241,11 +254,18 @@ Plus feature importance weights so teachers understand *why* predictions are mad
 - `dataset.json` - Sample dataset (50 synthetic AP students)
 - `process_kaggle_data.py` - Kaggle CSV to AP format converter
 
+### **Backend Options**
+- **Node.js Backend** (server.js) - Fast, lightweight, JavaScript
+- **Spring Boot Backend** (springboot-backend/) - Enterprise, type-safe, Java
+- Both expose identical REST APIs on different ports
+
 ### **Documentation**
 - `README.md` - Project setup and documentation (this file)
+- `springboot-backend/README.md` - Spring Boot setup & deployment guide
 - `HACKATHON_PITCH.md` - 5-minute judge presentation guide
 - `PROJECT_SUMMARY.md` - Technical architecture overview
 - `DATASET_README.md` - Dataset specifications and feature descriptions
+- `INTERVENTIONS_GUIDE.md` - How to log and view interventions
 - `KAGGLE_SETUP.md` - Kaggle API installation guide
 
 ---
